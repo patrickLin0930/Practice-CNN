@@ -31,3 +31,12 @@
 本數據集受到 CC-BY-SA 4.0 授權。請確保遵守該授權條款，並在使用時引用原始數據集的來源。
 
 
+## 文件說明 => 
+
+CNN/scissors-rock-paper.py:訓練模型PY
+
+CNN/kaggle.json:KAGGLE資料集
+
+CNN/test :測試用照片(自拍手三情境)
+
+CNN/test.py :測試用py
