@@ -23,25 +23,30 @@ dataset_dir = "scissors-rock-paper"
 def load_images_and_labels(dataset_dir):
     images = []
     labels = []
-    class_names = sorted(os.listdir(dataset_dir))
+    class_names = sorted([d for d in os.listdir(dataset_dir) if os.path.isdir(os.path.join(dataset_dir, d))])
+
+    # 打印資料夾名稱與對應的數字標籤
+    print("資料夾對應的標籤:")
     for label, class_name in enumerate(class_names):
+        print(f"{class_name} -> {label}")  # 打印對應關係
+        
         class_dir = os.path.join(dataset_dir, class_name)
-        if os.path.isdir(class_dir):
-            for file in os.listdir(class_dir):
-                file_path = os.path.join(class_dir, file)
-                # 跳過文件跟非圖片檔案
-                if os.path.isdir(file_path) or not file_path.endswith(('.png', '.jpg', '.jpeg')):
-                    continue
-                # 讀取圖片數據(包含標籤)跟調整大小
-                image = cv2.imread(file_path)
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                image = cv2.resize(image, (img_width, img_height))
-                images.append(image)
-                labels.append(label-1)
+        for file in os.listdir(class_dir):
+            file_path = os.path.join(class_dir, file)
+            if os.path.isdir(file_path) or not file_path.endswith(('.png', '.jpg', '.jpeg')):
+                continue
+            # 讀取圖片數據並調整大小
+            image = cv2.imread(file_path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            image = cv2.resize(image, (img_width, img_height))
+            images.append(image)
+            labels.append(label)  # 使用正確的標籤
+
     return np.array(images), np.array(labels)
 
-# load圖片跟標籤
+# 加載圖片和標籤
 images, labels = load_images_and_labels(dataset_dir)
+
 
 # 打亂數據集
 shuffle_indices = np.random.permutation(len(images))
@@ -82,7 +87,7 @@ model = models.Sequential([
     ##連接層
     layers.Dense(64, activation='relu'),
     layers.Dropout(0.5),
-    layers.Dense(4, activation='sigmoid')
+    layers.Dense(4, activation='softmax')
 ])
 
 ##配置模型(優化器、損失函數、評估標準)
@@ -108,7 +113,9 @@ test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
 print('\nTest loss:', test_loss)
 # 保存模型
-#model.save('trained_model.h5')
+# model.save('trained_model.h5')
+##不要用舊的HDF5格式
+model.save('my_model.keras')
 ##----------------------------------------
 # load 模型
 #from tensorflow.keras.models import load_model
